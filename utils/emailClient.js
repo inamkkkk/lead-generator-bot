@@ -3,39 +3,48 @@ const appLogger = require('./logger');
 
 let transporter;
 
-const initializeEmailClient = () => {
+const initializeEmailClient = async () => {
   if (transporter) {
     appLogger.info('Email client already initialized.');
-    return transporter;
+    return;
+  }
+
+  const smtpPort = parseInt(process.env.EMAIL_SMTP_PORT, 10);
+  if (isNaN(smtpPort)) {
+    throw new Error('Invalid EMAIL_SMTP_PORT environment variable.');
   }
 
   transporter = nodemailer.createTransport({
     host: process.env.EMAIL_SMTP_HOST,
-    port: process.env.EMAIL_SMTP_PORT,
-    secure: process.env.EMAIL_SMTP_PORT == 465, // Use `true` for port 465, `false` for other ports like 587
+    port: smtpPort,
+    secure: smtpPort === 465, // Use true for port 465, false for all other ports
     auth: {
       user: process.env.EMAIL_SMTP_USER,
       pass: process.env.EMAIL_SMTP_PASS,
     },
   });
 
-  transporter.verify(function (error, success) {
-    if (error) {
-      appLogger.error('Email client verification failed:', { error: error.message });
-    } else {
-      appLogger.info('Email client is ready to send messages.');
-    }
-  });
-
-  return transporter;
+  // The original implementation had a race condition where the client could be used before
+  // it was verified. Using async/await fixes this by ensuring verification completes
+  // before the function returns.
+  try {
+    await transporter.verify();
+    appLogger.info('Email client is ready to send messages.');
+  } catch (error) {
+    appLogger.error('Email client verification failed:', { error: error.message });
+    // Reset transporter on failure to allow for re-initialization attempts
+    transporter = null;
+    throw error; // Re-throw to signal that initialization failed
+  }
 };
 
 const sendEmail = async (to, subject, htmlContent, textContent) => {
+  // Ensure the client is initialized before attempting to send an email.
   if (!transporter) {
-    initializeEmailClient();
-    if (!transporter) {
-      throw new Error('Email client could not be initialized.');
-    }
+    // The original logic was flawed as it called a synchronous function with an
+    // async callback, leading to race conditions. Awaiting initialization ensures
+    // the transporter is ready and verified before proceeding.
+    await initializeEmailClient();
   }
 
   const mailOptions = {
@@ -51,7 +60,8 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
     appLogger.info(`Email sent to ${to}: ${info.messageId}`);
     return info;
   } catch (error) {
-    appLogger.error(`Failed to send email to ${to}: ${error.message}`, { error: error });
+    // Log the error and re-throw it so the caller can handle the failure.
+    appLogger.error(`Failed to send email to ${to}.`, { error: error.stack });
     throw error;
   }
 };
