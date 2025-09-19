@@ -3,19 +3,20 @@ const router = express.Router();
 const leadController = require('../controllers/leadController');
 const { validate, leadValidationSchemas } = require('../middlewares/validationMiddleware');
 
-// Get all leads
-router.get('/', leadController.getAllLeads);
+// Routes for the collection of leads
+router.route('/')
+  // Get all leads
+  .get(leadController.getAllLeads)
+  // Create a new lead
+  .post(validate(leadValidationSchemas.createLead), leadController.createLead);
 
-// Get a single lead by ID
-router.get('/:id', leadController.getLeadById);
-
-// Create a new lead
-router.post('/', validate(leadValidationSchemas.createLead), leadController.createLead);
-
-// Update a lead by ID
-router.put('/:id', validate(leadValidationSchemas.updateLead), leadController.updateLead);
-
-// Delete a lead by ID
-router.delete('/:id', leadController.deleteLead);
+// Routes for a single lead identified by its ID
+router.route('/:id')
+  // Get a single lead by ID
+  .get(leadController.getLeadById)
+  // Update a lead by ID
+  .put(validate(leadValidationSchemas.updateLead), leadController.updateLead)
+  // Delete a lead by ID
+  .delete(leadController.deleteLead);
 
 module.exports = router;
