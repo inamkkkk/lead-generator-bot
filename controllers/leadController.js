@@ -8,10 +8,10 @@ const appLogger = require('../utils/logger');
 exports.getAllLeads = async (req, res) => {
   try {
     const leads = await Lead.find({});
-    success(res, 200, 'Leads retrieved successfully', leads);
+    return success(res, 200, 'Leads retrieved successfully', leads);
   } catch (err) {
     appLogger.error(`Failed to retrieve leads: ${err.message}`, { error: err });
-    error(res, 500, 'Failed to retrieve leads', err.message);
+    return error(res, 500, 'Failed to retrieve leads', err.message);
   }
 };
 
@@ -24,10 +24,14 @@ exports.getLeadById = async (req, res) => {
     if (!lead) {
       return error(res, 404, 'Lead not found');
     }
-    success(res, 200, 'Lead retrieved successfully', lead);
+    return success(res, 200, 'Lead retrieved successfully', lead);
   } catch (err) {
     appLogger.error(`Failed to retrieve lead ${req.params.id}: ${err.message}`, { error: err });
-    error(res, 500, 'Failed to retrieve lead', err.message);
+    // Handle invalid ObjectId format by treating it as not found
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
+      return error(res, 404, 'Lead not found');
+    }
+    return error(res, 500, 'Failed to retrieve lead', err.message);
   }
 };
 
@@ -38,15 +42,15 @@ exports.createLead = async (req, res) => {
   try {
     // validatedBody comes from validationMiddleware using Joi
     const newLead = await Lead.create(req.validatedBody);
-    success(res, 201, 'Lead created successfully', newLead);
+    return success(res, 201, 'Lead created successfully', newLead);
   } catch (err) {
-    appLogger.error(`Failed to create lead: ${err.message}`, { error: err, body: req.body });
+    appLogger.error(`Failed to create lead: ${err.message}`, { error: err, body: req.validatedBody });
     // Handle duplicate key error specifically for unique email/phone
     if (err.code === 11000) {
       const field = Object.keys(err.keyValue)[0];
-      return error(res, 400, `Lead with this ${field} already exists.`, { duplicateField: field });
+      return error(res, 409, `Lead with this ${field} already exists.`, { duplicateField: field });
     }
-    error(res, 500, 'Failed to create lead', err.message);
+    return error(res, 500, 'Failed to create lead', err.message);
   }
 };
 
@@ -62,14 +66,19 @@ exports.updateLead = async (req, res) => {
     if (!updatedLead) {
       return error(res, 404, 'Lead not found');
     }
-    success(res, 200, 'Lead updated successfully', updatedLead);
+    return success(res, 200, 'Lead updated successfully', updatedLead);
   } catch (err) {
-    appLogger.error(`Failed to update lead ${req.params.id}: ${err.message}`, { error: err, body: req.body });
+    appLogger.error(`Failed to update lead ${req.params.id}: ${err.message}`, { error: err, body: req.validatedBody });
+    // Handle invalid ObjectId format by treating it as not found
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
+      return error(res, 404, 'Lead not found');
+    }
+    // Handle duplicate key error
     if (err.code === 11000) {
       const field = Object.keys(err.keyValue)[0];
-      return error(res, 400, `Another lead with this ${field} already exists.`, { duplicateField: field });
+      return error(res, 409, `Another lead with this ${field} already exists.`, { duplicateField: field });
     }
-    error(res, 500, 'Failed to update lead', err.message);
+    return error(res, 500, 'Failed to update lead', err.message);
   }
 };
 
@@ -82,9 +91,13 @@ exports.deleteLead = async (req, res) => {
     if (!deletedLead) {
       return error(res, 404, 'Lead not found');
     }
-    success(res, 200, 'Lead deleted successfully', { id: req.params.id });
+    return success(res, 200, 'Lead deleted successfully', { id: deletedLead._id });
   } catch (err) {
     appLogger.error(`Failed to delete lead ${req.params.id}: ${err.message}`, { error: err });
-    error(res, 500, 'Failed to delete lead', err.message);
+    // Handle invalid ObjectId format by treating it as not found
+    if (err.name === 'CastError' && err.kind === 'ObjectId') {
+      return error(res, 404, 'Lead not found');
+    }
+    return error(res, 500, 'Failed to delete lead', err.message);
   }
 };
