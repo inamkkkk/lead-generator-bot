@@ -22,7 +22,9 @@ const initializeWhatsappClient = () => {
     puppeteer: {
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    }
+    },
+    // FFMPEG is required for processing video/audio
+    ffmpegPath: process.env.FFMPEG_PATH,
   });
 
   whatsappClient.on('qr', (qr) => {
@@ -52,62 +54,74 @@ const initializeWhatsappClient = () => {
     appLogger.warn('WhatsApp Client was disconnected!', { reason });
     clientReady = false;
     Log.create({ level: 'warn', module: 'WhatsApp', message: `Client disconnected: ${reason}` });
-    // Attempt to re-initialize or log for manual intervention
+    
+    // Attempt to re-initialize after a delay
     setTimeout(() => {
       appLogger.info('Attempting to re-initialize WhatsApp client...');
-      whatsappClient.initialize();
-    }, 5000);
+      whatsappClient.initialize().catch(err => {
+        appLogger.error('Re-initialization failed after disconnection.', { error: err.message });
+        // TODO: Implement more robust recovery logic, e.g., exponential backoff or alerting.
+      });
+    }, 15000); // Increased delay for recovery
   });
 
   whatsappClient.on('message', async (msg) => {
-    if (msg.fromMe) return; // Ignore messages sent by the bot itself
+    // Ignore messages sent by the bot itself or status updates
+    if (msg.fromMe || msg.from === 'status@broadcast') {
+      return;
+    }
 
-    const contact = await msg.getContact();
-    const phoneNumber = contact.number; // Phone number without country code usually
-    const fullPhoneNumber = contact.id.user + '@c.us'; // E.164 format for comparison (e.g. 1234567890@c.us)
+    const chatId = msg.from; // e.g., '1234567890@c.us'
+    const phoneNumber = chatId.split('@')[0];
 
-    appLogger.info(`Incoming WhatsApp message from ${phoneNumber}: ${msg.body}`);
+    appLogger.info(`Incoming WhatsApp message from ${phoneNumber}: "${msg.body}"`);
+    
+    try {
+      // Find a lead where the phone number matches.
+      // This regex handles cases where the DB might store numbers with or without a '+' prefix.
+      const lead = await Lead.findOne({ phone: new RegExp(`^\\+?${phoneNumber}$`) });
 
-    // Check if the sender is a known lead (matching by phone number)
-    const lead = await Lead.findOne({ phone: new RegExp(`^\+?${phoneNumber.replace(/\D/g,'')}$`) });
+      if (lead) {
+        appLogger.info(`Incoming message from known lead: ${lead.name} (${phoneNumber})`);
+        
+        // Log incoming message
+        await Response.create({
+          leadId: lead._id,
+          channel: 'whatsapp',
+          direction: 'incoming',
+          messageContent: msg.body,
+          externalMessageId: msg.id.id,
+          status: 'received'
+        });
 
-    if (lead) {
-      appLogger.info(`Incoming message from known lead: ${lead.name} (${phoneNumber})`);
-      // Log incoming message
-      await Response.create({
-        leadId: lead._id,
-        channel: 'whatsapp',
-        direction: 'incoming',
-        messageContent: msg.body,
-        externalMessageId: msg.id.id,
-        status: 'received'
-      });
+        // Pass to controller for AI processing and reply logic
+        handleIncomingWhatsAppMessage(whatsappClient, lead, msg);
 
-      // Pass to controller for AI processing and reply logic
-      handleIncomingWhatsAppMessage(whatsappClient, lead, msg);
-
-    } else {
-      // Rule: ignore or log without response for unknown leads
-      appLogger.warn(`Incoming WhatsApp message from unknown number ${phoneNumber}. Ignoring.`);
+      } else {
+        // Rule: ignore or log without response for unknown leads
+        appLogger.warn(`Incoming WhatsApp message from unknown number ${phoneNumber}. Ignoring.`);
+        await Log.create({
+          level: 'warn',
+          module: 'WhatsApp',
+          message: `Incoming message from unknown number. Ignoring.`, 
+          metadata: { from: phoneNumber, message: msg.body }
+        });
+      }
+    } catch (error) {
+      appLogger.error('Error processing incoming WhatsApp message.', { error: error.message, from: phoneNumber });
       await Log.create({
-        level: 'warn',
+        level: 'error',
         module: 'WhatsApp',
-        message: `Incoming message from unknown number. Ignoring.`, 
-        metadata: { from: phoneNumber, message: msg.body }
+        message: 'Error processing incoming WhatsApp message.',
+        metadata: { from: phoneNumber, message: msg.body, error: error.message }
       });
     }
   });
 
-  // Handle typing indicators (optional)
-  whatsappClient.on('message_create', async (msg) => {
-    if (msg.fromMe && msg.type === 'chat') {
-      const chat = await msg.getChat();
-      // Not strictly 'typing', but could be used to indicate bot activity
-      // chat.sendStateTyping(); // This usually implies an active chat, not specific to message_create
-    }
+  whatsappClient.initialize().catch(err => {
+    appLogger.error('Failed to initialize WhatsApp client.', { error: err.message });
   });
 
-  whatsappClient.initialize();
   return whatsappClient;
 };
 
@@ -115,17 +129,20 @@ const getWhatsappClient = () => whatsappClient;
 const isWhatsappClientReady = () => clientReady;
 
 const sendWhatsAppMessage = async (to, message) => {
-  if (!clientReady) {
-    throw new Error('WhatsApp client is not ready. Please initialize and wait for it to be ready.');
+  if (!isWhatsappClientReady()) {
+    const errorMessage = 'WhatsApp client is not ready. Cannot send message.';
+    appLogger.error(errorMessage);
+    throw new Error(errorMessage);
   }
   try {
     // Ensure 'to' is in the correct format (e.g., '1234567890@c.us')
     const chatId = to.includes('@c.us') ? to : `${to.replace(/\D/g, '')}@c.us`;
-    await whatsappClient.sendMessage(chatId, message);
+    const sentMessage = await whatsappClient.sendMessage(chatId, message);
     appLogger.info(`WhatsApp message sent to ${chatId}`);
-    return true;
+    return sentMessage;
   } catch (error) {
-    appLogger.error(`Failed to send WhatsApp message to ${to}: ${error.message}`, { error: error });
+    appLogger.error(`Failed to send WhatsApp message to ${to}.`, { error: error.message, stack: error.stack });
+    // Re-throw the error so the caller can handle it
     throw error;
   }
 };
