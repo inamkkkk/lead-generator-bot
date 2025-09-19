@@ -3,9 +3,9 @@ const router = express.Router();
 const schedulerController = require('../controllers/schedulerController');
 
 // Route to manually trigger the daily lead outreach job
-router.post('/start-daily-job', schedulerController.triggerDailyJobManually);
+router.post('/trigger-job', schedulerController.triggerDailyJobManually);
 
-// Route to get the status of the scheduler and last job
+// Route to get the status of the scheduler and the last job run
 router.get('/status', schedulerController.getSchedulerAndJobStatus);
 
 // Route to stop the daily scheduler
