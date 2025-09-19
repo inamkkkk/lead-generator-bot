@@ -1,7 +1,6 @@
 const cron = require('node-cron');
 const appLogger = require('./logger');
-const Job = require('../models/Job');
-const { runDailyLeadOutreach } = require('../controllers/schedulerController');
+const { runDailyLeadOutreach } = require('../services/schedulerService');
 
 let dailyJobScheduler;
 
@@ -20,7 +19,10 @@ const startDailyScheduler = () => {
       await runDailyLeadOutreach();
       appLogger.info('Daily lead outreach job completed successfully via scheduler.');
     } catch (error) {
-      appLogger.error('Daily lead outreach job failed via scheduler:', { error: error.message, stack: error.stack });
+      appLogger.error('Daily lead outreach job failed via scheduler:', { 
+        error: error.message, 
+        stack: error.stack 
+      });
       // TODO: Implement retry policy on failure from spec (currently manual retry or next day)
     }
   }, {
@@ -40,8 +42,9 @@ const stopDailyScheduler = () => {
 };
 
 const getSchedulerStatus = () => {
+  // This status reflects the state managed by this module, not the cron job's internal state.
   return dailyJobScheduler ? 'running' : 'stopped';
-}
+};
 
 module.exports = {
   startDailyScheduler,
