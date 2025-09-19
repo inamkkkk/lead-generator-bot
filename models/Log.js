@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
 
-const LogSchema = new mongoose.Schema({
+const LogSchema = new Schema({
   level: {
     type: String,
     enum: ['info', 'warn', 'error', 'debug', 'critical'],
@@ -19,7 +19,9 @@ const LogSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  metadata: mongoose.Schema.Types.Mixed, // Any additional data like error stack, leadId, jobId etc.
+  metadata: {
+    type: Schema.Types.Mixed, // Any additional data like error stack, leadId, jobId etc.
+  },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Log', LogSchema);
+module.exports = model('Log', LogSchema);
