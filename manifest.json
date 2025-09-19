@@ -1,0 +1,353 @@
+{
+  "files": [
+    {
+      "path": "package.json",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:46:00.323Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:46:00.323Z, attempts: 1"
+      ]
+    },
+    {
+      "path": ".env.example",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:46:24.038Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:46:24.038Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "server.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:47:18.711Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:47:18.711Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "config/db.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:47:54.555Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:47:54.555Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "config/env.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:48:15.247Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:48:15.247Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "models/Lead.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:49:14.031Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:49:14.031Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "models/Job.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:49:32.857Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:49:32.857Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "models/Response.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:50:09.339Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:50:09.339Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "models/Summary.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:50:21.496Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:50:21.496Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "models/Log.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:51:08.091Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:51:08.091Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "middlewares/errorHandler.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:51:55.090Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:51:55.090Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "middlewares/requestLogger.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:52:27.764Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:52:27.764Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "middlewares/validationMiddleware.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:53:22.242Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:53:22.242Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "utils/apiResponse.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:54:14.603Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:54:14.603Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "utils/logger.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:54:54.190Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:54:54.190Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "utils/whatsappClient.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:55:47.353Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:55:47.353Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "utils/emailClient.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:56:38.198Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:56:38.198Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "utils/geminiClient.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:57:44.908Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:57:44.908Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "utils/scheduler.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:58:03.127Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:58:03.127Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "routes/leadRoutes.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:59:01.900Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:59:01.900Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "routes/scraperRoutes.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:59:15.620Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:59:15.620Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "routes/messagingRoutes.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:59:30.681Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:59:30.681Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "routes/aiRoutes.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T14:59:58.732Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T14:59:58.732Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "routes/schedulerRoutes.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T15:00:15.428Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T15:00:15.428Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "controllers/leadController.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T15:01:21.171Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T15:01:21.171Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "controllers/scraperController.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 2,
+      "lastRefinedAt": "2025-09-19T15:02:09.810Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T15:02:09.810Z, attempts: 2"
+      ]
+    },
+    {
+      "path": "controllers/messagingController.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T15:03:05.423Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T15:03:05.423Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "controllers/aiController.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T15:03:53.742Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T15:03:53.742Z, attempts: 1"
+      ]
+    },
+    {
+      "path": "controllers/schedulerController.js",
+      "visited": true,
+      "ok": true,
+      "error": null,
+      "attempts": 1,
+      "lastRefinedAt": "2025-09-19T15:04:55.880Z",
+      "modelUsed": "gemini-2.5-pro",
+      "refinementNotes": [
+        "Refined successfully at 2025-09-19T15:04:55.880Z, attempts: 1"
+      ]
+    }
+  ],
+  "generatedAt": "2025-09-19T14:45:30.066Z"
+}
