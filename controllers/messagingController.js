@@ -1,10 +1,9 @@
 const Lead = require('../models/Lead');
 const Response = require('../models/Response');
-const Job = require('../models/Job');
 const Log = require('../models/Log');
 const { success, error } = require('../utils/apiResponse');
 const appLogger = require('../utils/logger');
-const { initializeWhatsappClient, getWhatsappClient, isWhatsappClientReady, sendWhatsAppMessage } = require('../utils/whatsappClient');
+const { initializeWhatsappClient, isWhatsappClientReady, sendWhatsAppMessage } = require('../utils/whatsappClient');
 const { initializeEmailClient, sendEmail } = require('../utils/emailClient');
 const { getGeminiModel } = require('../utils/geminiClient');
 const { getDailyLeadsSentCount, incrementDailyLeadsSentCount } = require('./schedulerController'); // To check daily limit
@@ -40,9 +39,13 @@ exports.getWhatsAppStatus = async (req, res) => {
 // @route   POST /api/messaging/send
 // @access  Public (for internal bot use)
 exports.sendLeadMessage = async (req, res) => {
-  const { leadId, channel, templateId, variables } = req.validatedBody;
+  const { leadId, channel } = req.body;
 
   try {
+    if (!leadId || !channel) {
+      return error(res, 400, 'Missing required fields: leadId, channel.');
+    }
+
     const lead = await Lead.findById(leadId);
     if (!lead) {
       return error(res, 404, 'Lead not found.');
@@ -110,7 +113,7 @@ exports.sendLeadMessage = async (req, res) => {
 
       success(res, 200, `Message sent to lead ${lead.name} via ${channel}`, { leadId: lead._id, channel });
     } else {
-      error(res, 500, 'Failed to send message: channel not supported or not ready.');
+      error(res, 400, 'Failed to send message: channel not supported or not ready.');
     }
 
   } catch (err) {
@@ -120,7 +123,7 @@ exports.sendLeadMessage = async (req, res) => {
 };
 
 // Helper for incoming WhatsApp messages, called by whatsappClient.js
-exports.handleIncomingWhatsAppMessage = async (whatsappClient, lead, msg) => {
+exports.handleIncomingWhatsAppMessage = async (lead, msg) => {
   appLogger.info(`Processing incoming WhatsApp message for lead ${lead._id}`);
 
   // Rule: only reply to leads that already exist in its database
@@ -137,16 +140,17 @@ exports.handleIncomingWhatsAppMessage = async (whatsappClient, lead, msg) => {
   const geminiModel = getGeminiModel();
   if (!geminiModel) {
     appLogger.warn('Gemini client not initialized. Cannot generate AI reply for incoming message.');
-    return Log.create({ level: 'warn', module: 'Messaging', message: 'Gemini not ready for incoming message processing.', metadata: { leadId: lead._id } });
+    await Log.create({ level: 'warn', module: 'Messaging', message: 'Gemini not ready for incoming message processing.', metadata: { leadId: lead._id } });
+    return;
   }
 
   try {
     // Simulate AI typing indicator (if whatsapp-web.js supports it directly on chat object, or manual delay)
     const chat = await msg.getChat();
-    chat.sendStateTyping();
+    await chat.sendStateTyping();
     await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 1000)); // Random delay
 
-    const conversationHistory = await Response.find({ leadId: lead._id, channel: 'whatsapp' }).sort({ timestamp: 1 }).limit(10);
+    const conversationHistory = await Response.find({ leadId: lead._id, channel: 'whatsapp' }).sort({ createdAt: 1 }).limit(10);
     const formattedHistory = conversationHistory.map(r => `${r.direction === 'outgoing' ? 'Bot' : 'Lead'}: ${r.messageContent}`).join('\n');
 
     const aiPrompt = `The lead '${lead.name}' sent the following message: "${msg.body}". 
@@ -159,6 +163,7 @@ Based on this, craft a natural and business-friendly WhatsApp reply. Keep it con
     const response = await result.response;
     const aiReply = response.text();
 
+    await chat.clearState(); // Clear typing indicator before sending
     await sendWhatsAppMessage(msg.from, aiReply);
     appLogger.info(`AI replied to lead ${lead._id} via WhatsApp.`);
 
@@ -175,8 +180,6 @@ Based on this, craft a natural and business-friendly WhatsApp reply. Keep it con
       lead.status = 'replied';
       await lead.save();
     }
-
-    chat.clearState(); // Clear typing indicator
 
   } catch (aiError) {
     appLogger.error(`Failed to generate AI reply for lead ${lead._id}: ${aiError.message}`, { error: aiError });
@@ -198,5 +201,5 @@ exports.handleIncomingEmail = async (emailData) => {
   // 5. Use Gemini AI for natural, business-friendly reply generation.
   // 6. Send reply via 'sendEmail' utility.
   // 7. If unknown, log without response as per rules.
-  Log.create({ level: 'info', module: 'Messaging', message: 'Incoming email processing stub.', metadata: { emailData: emailData } });
+  await Log.create({ level: 'info', module: 'Messaging', message: 'Incoming email processing stub.', metadata: { emailData: emailData } });
 };
