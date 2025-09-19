@@ -5,7 +5,7 @@ const SummarySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lead',
     required: true,
-    unique: true, // Only one summary per lead for now, can be array if multiple summaries are needed
+    unique: true, // Ensures one summary per lead
   },
   conversationSummary: {
     type: String,
@@ -15,10 +15,6 @@ const SummarySchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-  lastUpdatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-}, { timestamps: true });
+}, { timestamps: true }); // timestamps: true adds createdAt and updatedAt fields
 
 module.exports = mongoose.model('Summary', SummarySchema);
