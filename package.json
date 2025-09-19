@@ -1,6 +1,7 @@
 {
   "name": "lead-generator-bot",
   "version": "1.0.0",
+  "private": true,
   "description": "Autonomous Node.js assistant for lead generation and outreach.",
   "main": "server.js",
   "scripts": {
@@ -8,16 +9,19 @@
     "dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [
-    "nodejs",
-    "express",
-    "mongodb",
-    "whatsapp",
-    "email",
-    "scraper",
-    "gemini",
     "ai",
-    "bot"
+    "bot",
+    "email",
+    "express",
+    "gemini",
+    "mongodb",
+    "nodejs",
+    "scraper",
+    "whatsapp"
   ],
   "author": "Your Name/Organization",
   "license": "MIT",
