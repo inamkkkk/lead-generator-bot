@@ -13,12 +13,22 @@ const requiredEnvVars = [
   'EMAIL_SENDER_ADDRESS',
 ];
 
+/**
+ * Checks if all required environment variables are set.
+ * Throws an error if any are missing, listing all missing variables to facilitate setup.
+ */
 function checkEnvVariables() {
-  for (const varName of requiredEnvVars) {
-    if (!process.env[varName]) {
-      console.warn(`WARNING: Environment variable \`${varName}\` is not set. This might lead to unexpected behavior.`);
-    }
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    throw new Error(
+      `FATAL: Missing required environment variables: ${missingVars.join(', ')}. ` +
+      'Please check your .env file or environment configuration.'
+    );
   }
+
+  // TODO: Implement advanced validation (e.g., using Joi or Zod) to check formats
+  // for variables like PORT, MONGO_URI, and email settings.
 }
 
 module.exports = { checkEnvVariables };
