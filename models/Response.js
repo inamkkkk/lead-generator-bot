@@ -5,6 +5,7 @@ const ResponseSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lead',
     required: true,
+    index: true,
   },
   channel: {
     type: String,
@@ -20,18 +21,18 @@ const ResponseSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
   status: {
     type: String,
     enum: ['sent', 'received', 'failed'],
-    default: 'sent', // For outgoing messages
+    required: true, // Status must be explicitly set, as the initial state depends on the 'direction'.
   },
   externalMessageId: {
-    type: String, // ID from WhatsApp or Email service
+    type: String, // ID from the external service (e.g., WhatsApp, SendGrid)
+    index: true,  // For efficient lookup, e.g., via webhooks.
   }
-}, { timestamps: true });
+}, {
+  // This option adds `createdAt` and `updatedAt` fields, making a separate `timestamp` field redundant.
+  timestamps: true
+});
 
 module.exports = mongoose.model('Response', ResponseSchema);
